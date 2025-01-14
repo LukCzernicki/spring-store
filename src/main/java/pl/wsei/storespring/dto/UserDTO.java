@@ -1,13 +1,26 @@
 package pl.wsei.storespring.dto;
 
 import pl.wsei.storespring.model.User;
+import jakarta.validation.constraints.*;
 
 public class UserDTO {
 
+    @NotNull(message = "ID cannot be null.")
     private Long id;
+
+    @NotBlank(message = "Name cannot be empty.")
     private String name;
+
+    @NotBlank(message = "Surname cannot be empty.")
+    @Size(min = 2, message = "Surname must be at least 2 characters long.")
     private String surname;
+
+    @NotBlank(message = "Login cannot be empty.")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Login must contain only letters and numbers.")
     private String login;
+
+    @NotBlank(message = "Email cannot be empty.")
+    @Email(message = "Invalid email format.")
     private String email;
 
     // Gettery i settery

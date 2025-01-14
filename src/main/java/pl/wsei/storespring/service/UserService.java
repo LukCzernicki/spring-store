@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.wsei.storespring.dto.UserDTO;
 import pl.wsei.storespring.exception.ResourceNotFoundException;
+import pl.wsei.storespring.exception.ValidationException;
 import pl.wsei.storespring.model.User;
 import pl.wsei.storespring.repository.UserRepository;
 
@@ -33,6 +34,7 @@ public class UserService {
     }
 
     public User createUser(UserDTO userDTO) {
+        validateUniqueLogin(userDTO.getLogin());
         User user = UserDTO.toEntity(userDTO);
         return userRepository.save(user);
     }
@@ -41,9 +43,12 @@ public class UserService {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
+        if (!existingUser.getLogin().equals(userDTO.getLogin())) {
+            validateUniqueLogin(userDTO.getLogin());
+        }
+
         existingUser.setName(userDTO.getName());
         existingUser.setSurname(userDTO.getSurname());
-        existingUser.setLogin(userDTO.getLogin());
         existingUser.setEmail(userDTO.getEmail());
 
         return userRepository.save(existingUser);
@@ -53,6 +58,12 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
+    }
+
+    private void validateUniqueLogin(String login) {
+        if (userRepository.existsByLogin(login)) {
+            throw new ValidationException("Login '" + login + "' is already taken.");
+        }
     }
 }
 
