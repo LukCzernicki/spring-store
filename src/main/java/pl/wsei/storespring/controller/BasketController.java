@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import pl.wsei.storespring.dto.BasketDTO;
+import pl.wsei.storespring.dto.PromotionDTO;
 import pl.wsei.storespring.model.Basket;
 import pl.wsei.storespring.service.BasketService;
 
@@ -55,6 +56,20 @@ public class BasketController {
 	@DeleteMapping("/basket/{id}")
 	public ResponseEntity<Void> deleteBasket(@PathVariable Long id) {
 		basketService.deleteBasket(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@Operation(summary = "Get total basket value")
+	@GetMapping("/basket/{id}/total-value")
+	public ResponseEntity<Double> getBasketTotalValue(@PathVariable Long id) {
+		double totalValue = basketService.calculateBasketValue(id);
+		return ResponseEntity.ok(totalValue);
+	}
+
+	@Operation(summary = "Set promotion for basket")
+	@PostMapping("/basket/{id}/promotion")
+	public ResponseEntity<Void> setBasketPromotion(@PathVariable Long id, @RequestBody PromotionDTO promotionDTO) {
+		basketService.setPromotion(id, promotionDTO);
 		return ResponseEntity.noContent().build();
 	}
 }
